@@ -35,6 +35,7 @@ async function run() {
     app.get("/users", async (req, res) => {
       res.send(await users.find({}).toArray());
     });
+
     app.post("/users", async (req, res) => {
       res.json(await users.insertOne(req.body));
     });
@@ -50,21 +51,98 @@ async function run() {
     app.get("/products", async (req, res) => {
       res.send(await products.find({}).toArray());
     });
+
     app.post("/products", async (req, res) => {
       res.json(await products.insertOne(req.body));
     });
+
     app.delete("/products/:id", async (req, res) => {
       res.json(await products.deleteOne({ _id: ObjectId(req.params.id) }));
     });
+
+    app.delete("/products/remove/all", async (req, res) => {
+      res.json(await products.deleteMany({}));
+    });
+
     app.get("/medicine", async (req, res) => {
-      res.send(await products.find({}).toArray());
+      res.send(await medicine.find({}).toArray());
     });
+
+    app.put("/medicine/:id", async (req, res) => {
+      try {
+        const productId = req.params.id;
+        const updateFields = {};
+    
+        if (req.body.med_name) {
+          updateFields.med_name = req.body.med_name;
+        }
+    
+        if (req.body.gen_name) {
+          updateFields.gen_name = req.body.gen_name;
+        }
+    
+        if (req.body.comp_name) {
+          updateFields.comp_name = req.body.comp_name;
+        }
+    
+        if (req.body.mgml) {
+          updateFields.mgml = req.body.mgml;
+        }
+    
+        if (req.body.indication) {
+          updateFields.indication = req.body.indication;
+        }
+    
+        if (req.body.pharma) {
+          updateFields.pharma = req.body.pharma;
+        }
+    
+        if (req.body.dosage) {
+          updateFields.dosage = req.body.dosage;
+        }
+    
+        if (req.body.side_effect) {
+          updateFields.side_effect = req.body.side_effect;
+        }
+    
+        if (req.body.available) {
+          updateFields.available = req.body.available;
+        }
+    
+        if (req.body.ppp) {
+          updateFields.ppp = req.body.ppp;
+        }
+    
+        if (req.body.med_img) {
+          updateFields.med_img = req.body.med_img;
+        }
+    
+        // Add more fields here...
+    
+        const result = await users.updateOne(
+          { _id: new ObjectId(productId) },
+          { $set: updateFields }
+        );
+    
+        if (result.matchedCount > 0 && result.modifiedCount > 0) {
+          res.json({ message: "Product updated successfully" });
+        } else {
+          res.status(404).json({ error: "Product not found or not updated" });
+        }
+      } catch (error) {
+        res.status(500).json({ error: "An error occurred while updating the product" });
+      }
+    });
+    
+
     app.delete("/medicine/:id", async (req, res) => {
-      res.json(await medicine.deleteOne({ _id: ObjectId(req.params.id) }));
+      res.json(await medicine.deleteOne({ _id: new ObjectId(req.params.id) }));
     });
+
     app.post("/medicine", async (req, res) => {
-      res.json(await products.insertOne(req.body));
+      res.json(await medicine.insertOne(req.body));
     });
+
     app.delete("/users/:id", async (req, res) => {
       res.json(await users.deleteOne({ _id: ObjectId(req.params.id) }));
     });
